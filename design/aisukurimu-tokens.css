@@ -1,0 +1,276 @@
+/* ===============================================================
+   aisukurimu — global styles · Brand v3 (New Style / AS_Styles.svg)
+   Source of truth: design/New Style/01-style-refactor.md
+   @font-face declarations live in Base.astro so url() values can be
+   templated with the Astro `base` config (subpath deploy).
+   =============================================================== */
+
+:root {
+  /* -- Color tokens (New Style — Light) -- */
+  --ak-vanilla:               #eae8e0;   /* Vanilla — page background */
+  --ak-cappuccino:             #d9d7ce;   /* Cappucino — card / container background */
+  --ak-grape:           #5100ff;   /* Grape — links, accent, tags */
+  --ak-lemon:          #d8ff01;   /* Lemon — wurst background pattern */
+  --ak-blueberry:            #1f1934;   /* Blueberry — primary ink */
+  --ak-hazelnut:              #9e9c95;   /* Hazelnut — muted secondary text */
+  --ak-strawberry-container:  #EDCED4;   /* retained, unused in v3 for now */
+  --placeholder-image:        #00D8FF;
+
+  /* -- Spacing scale -- */
+  --sp-xs:  0.25rem;
+  --sp-sm:  0.5rem;
+  --sp-md:  1rem;
+  --sp-lg:  1.5rem;
+  --sp-xl:  2rem;
+  --sp-2xl: 3rem;
+  --sp-3xl: 4rem;
+  --sp-4xl: 6rem;
+
+  /* -- Layout -- */
+  --container-max: 1200px;
+  --gutter: 24px;
+}
+
+/* ---------- Reset / base ---------- */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  background: var(--ak-vanilla);   /* #e9e7df — light vanilla paper */
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  color: var(--ak-blueberry);     /* #1f1934 — deep indigo ink */
+}
+
+body {
+  background: transparent;
+}
+
+body {
+  font-family: "Public Sans", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img, svg { max-width: 100%; height: auto; display: block; }
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--ak-grape);   /* electric blue — lemon invisible on light bg */
+  outline-offset: 3px;
+}
+
+/* ---------- Character styles (XD Flow 2_04) ---------- */
+
+/* Title (80px) — eyebrow sits above in markup */
+.hero-title-vanilla {
+  font-family: "iA Writer Mono S", monospace;
+  font-weight: normal;
+  font-size: 80px;
+  line-height: 88px;
+  color: var(--ak-blueberry);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* H1 — 40px Bold Upper */
+.h1-vanilla {
+  font-family: "iA Writer Mono S", monospace;
+  font-weight: bold;
+  font-size: 40px;
+  line-height: 48px;
+  color: var(--ak-blueberry);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.h1-vanilla.cursor::after {
+  content: "_";
+  display: inline-block;
+  margin-left: 0.1em;
+  color: var(--ak-blueberry);
+  animation: ak-blink 1s steps(2) infinite;
+}
+
+@keyframes ak-blink {
+  50% { opacity: 0; }
+}
+
+/* H2 — Lemon role gone; now Indigo sentence-case */
+.h2-lcontainer {
+  font-family: "iA Writer Mono S", monospace;
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 32px;
+  color: var(--ak-blueberry);
+  margin: 0;
+}
+
+/* Eyebrow — 20px Bold UPPER Mono */
+.eyebrow {
+  font-family: "iA Writer Mono S", monospace;
+  font-weight: bold;
+  font-size: 20px;
+  line-height: 28px;
+  color: var(--ak-blueberry);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* Tag — 12px Bold lower Mono in Electric Blue */
+.tag {
+  font-family: "iA Writer Mono S", monospace;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ak-grape);
+  text-transform: lowercase;
+  margin: 0;
+}
+
+.p-big {
+  font-family: "Public Sans", sans-serif;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ak-blueberry);
+  margin: 0;
+}
+
+/* Secondary / muted paragraph */
+.p-small-vanilla {
+  font-family: "Public Sans", sans-serif;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ak-blueberry);
+  margin: 0;
+}
+
+.caption {
+  font-family: "Public Sans", sans-serif;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--ak-blueberry);
+  margin: 0;
+}
+
+.caption strong { font-weight: bold; }
+
+/* Links — Electric Blue, hover adds underline */
+.link-big {
+  font-family: "Public Sans", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ak-grape);
+  text-decoration: none;
+  transition: text-decoration .15s;
+}
+.link-big:hover,
+.link-big:focus-visible { text-decoration: underline; }
+
+/* Nav — Indigo default, Electric Blue active */
+.nav-item {
+  font-family: "iA Writer Mono S", monospace;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 16px;
+  color: var(--ak-blueberry);
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color .15s;
+}
+.nav-item:hover,
+.nav-item:focus-visible { color: var(--ak-grape); }
+.nav-item.active {
+  color: var(--ak-grape);
+  text-decoration: underline;
+}
+.nav-item.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.footer-links {
+  font-family: "Public Sans", sans-serif;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ak-hazelnut);
+  text-decoration: none;
+  transition: color .15s;
+}
+.footer-links:hover,
+.footer-links:focus-visible { color: var(--ak-blueberry); }
+
+/* ---------- Layout primitives ---------- */
+
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--sp-lg);
+}
+
+.hr {
+  /* Hairline divider in hazelnut. Constrained to 1200px container width
+     so the editorial frame stays consistent. Color-neutral class name. */
+  border: 0;
+  border-top: 1px solid var(--ak-blueberry);
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+
+section { padding: var(--sp-3xl) 0; }
+
+/* ---------- Placeholders (XD mockup markers) ---------- */
+
+.placeholder-image {
+  background: var(--placeholder-image);
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  border: 1px dashed rgba(0,0,0,.15);
+}
+
+.placeholder-circle {
+  background: var(--placeholder-image);
+  width: 280px; height: 280px;
+  border-radius: 50%;
+  border: 1px dashed rgba(0,0,0,.15);
+  margin-left: auto;
+}
+
+/* ---------- Accessibility ---------- */
+
+.sr-only {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Mobile (< 768px) ---------- */
+
+.mobile-toggle { display: none; }
+
+@media (max-width: 768px) {
+  .container { padding: 0 var(--sp-lg); }
+  .mobile-toggle { display: inline-block; }
+  .placeholder-circle { width: 200px; height: 200px; margin: 0 auto; }
+}
