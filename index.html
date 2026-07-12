@@ -1,3 +1,7 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
 <title>Spirit Sprint — Self-Service Flow Konzept</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -44,7 +48,7 @@
   --border:    rgba(31,25,52,.14);
   --rail-bg:   var(--ak-blueberry);
   --rail-ink:  var(--ak-vanilla);
-  --rail-muted: rgba(234,232,224,.56);
+  --rail-muted: rgba(234,232,224,.72);
 
   --sp-xs: .25rem; --sp-sm: .5rem; --sp-md: 1rem; --sp-lg: 1.5rem;
   --sp-xl: 2rem; --sp-2xl: 3rem; --sp-3xl: 4rem;
@@ -65,7 +69,7 @@
     --border:    rgba(241,239,232,.14);
     --rail-bg:   #0d0a16;
     --rail-ink:  #f1efe8;
-    --rail-muted: rgba(241,239,232,.5);
+    --rail-muted: rgba(241,239,232,.72);
   }
 }
 :root[data-theme="dark"] {
@@ -80,7 +84,7 @@
   --border:    rgba(241,239,232,.14);
   --rail-bg:   #0d0a16;
   --rail-ink:  #f1efe8;
-  --rail-muted: rgba(241,239,232,.5);
+  --rail-muted: rgba(241,239,232,.72);
 }
 :root[data-theme="light"] {
   --bg:        var(--ak-vanilla);
@@ -94,7 +98,7 @@
   --border:    rgba(31,25,52,.14);
   --rail-bg:   var(--ak-blueberry);
   --rail-ink:  var(--ak-vanilla);
-  --rail-muted: rgba(234,232,224,.56);
+  --rail-muted: rgba(234,232,224,.72);
 }
 
 * { box-sizing: border-box; }
@@ -144,10 +148,20 @@ h1, h2, h3 { font-family: var(--mono); margin: 0; text-wrap: balance; }
 .rail-brand span { color: var(--highlight); }
 .rail-sub { font-size: 11px; color: var(--rail-muted); margin-top: 2px; font-family: var(--mono); }
 
-.rail-progress {
-  height: 4px; background: rgba(241,239,232,.14); border-radius: 2px; overflow: hidden;
+.rail-share-label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .04em; color: var(--rail-muted);
+  margin: 0 0 6px;
 }
-.rail-progress i { display: block; height: 100%; width: 62%; background: var(--highlight); }
+.rail-share-row { display: flex; gap: 6px; }
+.rail-share-row input {
+  flex: 1; min-width: 0; background: rgba(241,239,232,.08); border: 1px solid rgba(241,239,232,.16);
+  border-radius: 5px; color: var(--rail-ink); font-family: var(--mono); font-size: 11px; padding: 6px 8px;
+}
+.rail-share-row button {
+  background: var(--highlight); color: var(--highlight-ink); border: 0; border-radius: 5px;
+  width: 30px; font-size: 14px; cursor: pointer; flex-shrink: 0;
+}
+.rail-share-row button.copied { background: var(--rail-ink); }
 
 nav.steps { display: flex; flex-direction: column; gap: var(--sp-xs); }
 .step-group { margin-bottom: var(--sp-md); }
@@ -220,10 +234,13 @@ label.step { display: block; }
   transform: translate(-50%,-50%);
 }
 .slider-row.chosen .track { background: var(--accent); opacity: .35; }
+.track[data-track] { cursor: pointer; }
 .axis-pick {
   display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px;
-  background: var(--accent); color: #fff; padding: 2px 8px; border-radius: 20px; margin-left: var(--sp-sm);
+  background: transparent; color: var(--muted); border: 1px solid var(--border); cursor: pointer;
+  padding: 2px 8px; border-radius: 20px; margin-left: var(--sp-sm);
 }
+.slider-row.chosen .axis-pick { background: var(--ak-grape); color: #fff; border-color: transparent; }
 
 /* 2x2 positioning */
 .quad-wrap { display: grid; grid-template-columns: 30px 1fr; grid-template-rows: 1fr 30px; gap: var(--sp-sm); height: 340px; }
@@ -253,12 +270,24 @@ label.step { display: block; }
   color: var(--muted); margin: 0 0 var(--sp-sm); text-align: center;
 }
 .note {
-  background: var(--surface); border-radius: 4px; padding: 8px 10px; font-size: 12.5px;
-  margin-bottom: 8px; position: relative; border: 1px solid transparent;
+  background: var(--surface); border-radius: 4px; padding: 8px 30px 8px 10px; font-size: 12.5px;
+  margin-bottom: 8px; position: relative; border: 1px solid transparent; cursor: pointer; user-select: none;
 }
+.note:hover { border-color: var(--accent); }
+.note.voted-by-me { border-color: var(--accent); border-style: dashed; }
 .note.kept { background: var(--highlight); color: var(--highlight-ink); font-weight: 700; border-color: transparent; }
-.vote { position: absolute; right: 6px; top: 6px; font-family: var(--mono); font-size: 9px; color: var(--accent); font-weight: 700; }
+.vote { position: absolute; right: 6px; top: 8px; font-family: var(--mono); font-size: 9px; color: var(--accent); font-weight: 700; }
 .note.kept .vote { color: var(--highlight-ink); opacity: .7; }
+.note-form { display: flex; gap: 4px; margin-top: 4px; }
+.note-form input {
+  flex: 1; min-width: 0; background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px;
+  padding: 6px 8px; font-size: 11.5px; font-family: var(--sans); color: var(--ink);
+}
+.note-form button {
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px; width: 26px;
+  color: var(--ink); cursor: pointer; font-size: 14px;
+}
+.board-hint { font-size: 11.5px; color: var(--muted); margin-top: var(--sp-lg); }
 
 /* Table */
 table.measures { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -293,27 +322,29 @@ table.measures tr td:first-child { font-family: var(--mono); font-weight: 700; f
 .trinity { display: grid; grid-template-columns: repeat(3,1fr); gap: var(--sp-lg); }
 .trinity-col h4 { font-family: var(--mono); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; margin-bottom: var(--sp-sm); }
 .trinity-col .chip { display: block; background: var(--surface); border: 1px solid var(--border); color: var(--ink); margin-bottom: 6px; }
+/* Fixed dark brand card — always ak-blueberry/vanilla, independent of the
+   page theme, since this is a shareable branded artifact, not themed UI. */
 .spirit-line {
-  margin-top: var(--sp-xl); background: var(--ink); color: var(--bg); border-radius: 6px; padding: var(--sp-lg);
+  margin-top: var(--sp-xl); background: var(--ak-blueberry); color: var(--ak-vanilla); border-radius: 6px; padding: var(--sp-lg);
   font-family: var(--mono); font-size: 15px; text-align: center;
 }
-.spirit-line b { color: var(--highlight); }
+.spirit-line b { color: var(--ak-lemon); }
 
 /* Export card */
 .spirit-card {
-  background: var(--ink); color: var(--bg); border-radius: 10px; padding: var(--sp-2xl);
+  background: var(--ak-blueberry); color: var(--ak-vanilla); border-radius: 10px; padding: var(--sp-2xl);
   max-width: 560px;
 }
-.spirit-card .eyebrow { color: var(--highlight); }
-.spirit-card h2 { font-size: 22px; color: var(--bg); margin-bottom: var(--sp-md); }
+.spirit-card .eyebrow { color: var(--ak-lemon); }
+.spirit-card h2 { font-size: 22px; color: var(--ak-vanilla); margin-bottom: var(--sp-md); }
 .spirit-card .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.12); font-size: 12.5px; }
-.spirit-card .row span:first-child { color: rgba(255,255,255,.5); font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; }
+.spirit-card .row span:first-child { color: rgba(255,255,255,.65); font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; }
 .export-actions { display: flex; gap: var(--sp-sm); margin-top: var(--sp-lg); }
 .btn {
   font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 9px 16px; border-radius: 5px;
   border: 1px solid var(--border); background: var(--surface); color: var(--ink); cursor: pointer;
 }
-.btn.primary { background: var(--accent); color: #fff; border-color: transparent; }
+.btn.primary { background: var(--ak-grape); color: #fff; border-color: transparent; }
 
 @media (max-width: 860px) {
   .shell { grid-template-columns: 1fr; }
@@ -323,6 +354,8 @@ table.measures tr td:first-child { font-family: var(--mono); font-weight: 700; f
   .head-row { flex-direction: column; align-items: flex-start; }
 }
 </style>
+</head>
+<body>
 
 <input type="radio" name="tab" id="t1" class="tabctl" checked>
 <input type="radio" name="tab" id="t2" class="tabctl">
@@ -337,9 +370,13 @@ table.measures tr td:first-child { font-family: var(--mono); font-weight: 700; f
       <div class="rail-brand">Spirit<span>Sprint</span></div>
       <div class="rail-sub">Self-Service Flow — Konzept</div>
     </div>
-    <div>
-      <div class="rail-progress"><i></i></div>
-      <div class="rail-sub" style="margin-top:8px;">4 / 6 Etappen offen</div>
+    <div class="rail-share">
+      <p class="rail-share-label">Team-Link — teilen zum gemeinsamen Ausfüllen</p>
+      <div class="rail-share-row">
+        <input type="text" readonly data-share-link value="Lädt…">
+        <button type="button" data-copy-link title="Link kopieren">⧉</button>
+      </div>
+      <p class="rail-sub" data-online-count style="margin-top:8px;">– online</p>
     </div>
     <nav class="steps">
       <div class="step-group">
@@ -408,43 +445,44 @@ table.measures tr td:first-child { font-family: var(--mono); font-weight: 700; f
       <p class="lede">Im Original steht die Regel als Kleingedrucktes unter den Slidern. Hier ist sie der Flow selbst: zwei Slider markieren, die gewählten Achsen bauen automatisch das 2×2-Feld auf der nächsten Karte — nichts wird manuell übertragen.</p>
       <div class="grid2">
         <div class="card">
-          <p style="font-family:var(--mono);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin:0 0 var(--sp-md);">Personality Sliders</p>
-          <div class="slider-row chosen">
+          <p style="font-family:var(--mono);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin:0 0 var(--sp-md);">Personality Sliders <span style="font-weight:400;normal-case;text-transform:none;">— Klick auf einen Track setzt den Wert, Klick auf „Achse wählen“ bestimmt die 2 Positioning-Achsen (max. 2)</span></p>
+          <div class="slider-row" data-axis="playful_serious" data-left="Playful" data-right="Serious">
             <span class="lbl">Playful</span>
-            <div class="track"><span class="thumb" style="left:18%;"></span></div>
-            <span class="lbl r">Serious<span class="axis-pick">Achse 1</span></span>
+            <div class="track" data-track><span class="thumb" style="left:50%;"></span></div>
+            <span class="lbl r">Serious<button type="button" class="axis-pick" data-axis-toggle>Achse wählen</button></span>
           </div>
-          <div class="slider-row">
+          <div class="slider-row" data-axis="conventional_rebel" data-left="Conventional" data-right="Rebel">
             <span class="lbl">Conventional</span>
-            <div class="track"><span class="thumb" style="left:78%;"></span></div>
-            <span class="lbl r">Rebel</span>
+            <div class="track" data-track><span class="thumb" style="left:50%;"></span></div>
+            <span class="lbl r">Rebel<button type="button" class="axis-pick" data-axis-toggle>Achse wählen</button></span>
           </div>
-          <div class="slider-row chosen">
+          <div class="slider-row" data-axis="contemporary_classic" data-left="Contemporary" data-right="Classic">
             <span class="lbl">Contemporary</span>
-            <div class="track"><span class="thumb" style="left:33%;"></span></div>
-            <span class="lbl r">Classic<span class="axis-pick">Achse 2</span></span>
+            <div class="track" data-track><span class="thumb" style="left:50%;"></span></div>
+            <span class="lbl r">Classic<button type="button" class="axis-pick" data-axis-toggle>Achse wählen</button></span>
           </div>
-          <div class="slider-row">
+          <div class="slider-row" data-axis="elite_broad" data-left="Elite" data-right="Broad">
             <span class="lbl">Elite</span>
-            <div class="track"><span class="thumb" style="left:70%;"></span></div>
-            <span class="lbl r">Broad</span>
+            <div class="track" data-track><span class="thumb" style="left:50%;"></span></div>
+            <span class="lbl r">Broad<button type="button" class="axis-pick" data-axis-toggle>Achse wählen</button></span>
           </div>
         </div>
         <div class="card">
           <p style="font-family:var(--mono);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin:0 0 var(--sp-md);">Positioning — automatisch aufgebaut</p>
-          <div class="quad-wrap">
-            <span class="quad-axis-y"><span>Contemporary</span><span>Classic</span></span>
+          <div class="quad-wrap" id="positioning-quad">
+            <span class="quad-axis-y" data-axis-y><span></span><span></span></span>
             <div class="quad">
               <span class="pin" style="top:20%;left:14%;">Fumetto</span>
               <span class="pin" style="top:34%;left:63%;">Thought Bubble Fest</span>
               <span class="pin" style="top:42%;left:82%;">Boom Fest</span>
               <span class="pin" style="top:58%;left:88%;">Comic Con</span>
               <span class="pin" style="top:76%;left:58%;">Angoulême</span>
-              <span class="pin us" style="top:26%;left:42%;">Here we are</span>
+              <span class="pin us" data-pin-us style="top:50%;left:50%;">Here we are</span>
             </div>
             <span></span>
-            <span class="quad-axis-x"><span>Playful</span><span>Serious</span></span>
+            <span class="quad-axis-x" data-axis-x><span></span><span></span></span>
           </div>
+          <p class="quad-empty" data-quad-empty style="font-size:12px;color:var(--muted);margin-top:var(--sp-sm);">Wählt 2 Achsen links, um das Feld aufzubauen.</p>
         </div>
       </div>
     </section>
@@ -459,34 +497,49 @@ table.measures tr td:first-child { font-family: var(--mono); font-weight: 700; f
         <span class="fix-badge">bringt <b>Konvergenz</b> in offene Brainstorms</span>
       </div>
       <p class="lede">Fünf Spalten wie im Original (Culture, Technology, Business, Planet, Organisation) — aber nach dem Sammeln stimmt das Team pro Spalte ab. Nur die „Keeper“ (gelb) wandern weiter in Value Measures und Trinity.</p>
-      <div class="board">
-        <div class="board-col">
+      <div class="board" id="values-board">
+        <div class="board-col" data-board="culture">
           <h4>Culture</h4>
-          <div class="note kept">Inclusivity & diversity<span class="vote">●●●●</span></div>
-          <div class="note">flat hierarchies<span class="vote">●●</span></div>
-          <div class="note">Berlin code of conduct<span class="vote">●</span></div>
+          <div class="notes" data-notes></div>
+          <form class="note-form" data-note-form>
+            <input type="text" maxlength="80" placeholder="z. B. „Inclusivity & diversity“" required>
+            <button type="submit">+</button>
+          </form>
         </div>
-        <div class="board-col">
+        <div class="board-col" data-board="technology">
           <h4>Technology</h4>
-          <div class="note kept">Value Privacy<span class="vote">●●●●</span></div>
-          <div class="note">Remote Tools<span class="vote">●●</span></div>
+          <div class="notes" data-notes></div>
+          <form class="note-form" data-note-form>
+            <input type="text" maxlength="80" placeholder="z. B. „Value Privacy“" required>
+            <button type="submit">+</button>
+          </form>
         </div>
-        <div class="board-col">
+        <div class="board-col" data-board="business">
           <h4>Business</h4>
-          <div class="note kept">Affordable<span class="vote">●●●●●</span></div>
-          <div class="note">Free Entrance<span class="vote">●</span></div>
+          <div class="notes" data-notes></div>
+          <form class="note-form" data-note-form>
+            <input type="text" maxlength="80" placeholder="z. B. „Affordable“" required>
+            <button type="submit">+</button>
+          </form>
         </div>
-        <div class="board-col">
+        <div class="board-col" data-board="planet">
           <h4>Planet</h4>
-          <div class="note kept">Train beats Plane<span class="vote">●●●</span></div>
-          <div class="note">Bike over Benz<span class="vote">●</span></div>
+          <div class="notes" data-notes></div>
+          <form class="note-form" data-note-form>
+            <input type="text" maxlength="80" placeholder="z. B. „Train beats Plane“" required>
+            <button type="submit">+</button>
+          </form>
         </div>
-        <div class="board-col">
+        <div class="board-col" data-board="organisation">
           <h4>Organisation</h4>
-          <div class="note kept">solidarity community<span class="vote">●●●</span></div>
-          <div class="note">reassemble rolls annually<span class="vote">●</span></div>
+          <div class="notes" data-notes></div>
+          <form class="note-form" data-note-form>
+            <input type="text" maxlength="80" placeholder="z. B. „solidarity community“" required>
+            <button type="submit">+</button>
+          </form>
         </div>
       </div>
+      <p class="board-hint">Klick auf eine Karte = abstimmen. Die meistgevotete Karte pro Spalte wird automatisch „Keeper“ (gelb) und wandert weiter zu Value Measures &amp; Trinity.</p>
     </section>
 
     <!-- PANEL 3 — VALUE MEASURES + ROADMAP -->
@@ -582,10 +635,301 @@ table.measures tr td:first-child { font-family: var(--mono); font-weight: 700; f
         <div class="row"><span>2-Jahres-Ziel</span><span>Get longterm funding</span></div>
         <div class="export-actions">
           <button class="btn primary" type="button">Als PDF exportieren</button>
-          <button class="btn" type="button">Team-Link teilen</button>
+          <button class="btn" type="button" data-copy-link>Team-Link teilen</button>
         </div>
       </div>
     </section>
 
   </main>
 </div>
+
+<script src="./supabase-config.js"></script>
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const supabase = createClient(window.SPIRITSPRINT_SUPABASE_URL, window.SPIRITSPRINT_SUPABASE_ANON_KEY);
+
+const ADJECTIVES = ["Playful", "Curious", "Bold", "Quiet", "Sunny", "Rebel", "Gentle", "Sharp", "Warm", "Wild"];
+const ANIMALS = ["Fox", "Otter", "Falcon", "Panda", "Heron", "Lynx", "Puffin", "Wolf", "Crane", "Hare"];
+const COLORS = ["#5100ff", "#d8ff01", "#ff6b4a", "#00c2a8", "#ff4ecd", "#3aa0ff"];
+
+function randomFrom(list) { return list[Math.floor(Math.random() * list.length)]; }
+function randomSlug() {
+  return `${randomFrom(ADJECTIVES).toLowerCase()}-${randomFrom(ANIMALS).toLowerCase()}-${Math.floor(Math.random() * 900 + 100)}`;
+}
+
+// ---------- Session bootstrap ----------
+const url = new URL(location.href);
+let slug = url.searchParams.get("s");
+const isNewSession = !slug;
+if (!slug) {
+  slug = randomSlug();
+  url.searchParams.set("s", slug);
+  history.replaceState(null, "", url.toString());
+}
+
+async function ensureSession(slug) {
+  const { data: existing } = await supabase.from("spiritsprint_sessions").select("*").eq("slug", slug).maybeSingle();
+  if (existing) return existing;
+  const { data: created, error } = await supabase.from("spiritsprint_sessions").insert({ slug }).select().single();
+  if (error) {
+    // Lost the race to create it (someone else just did) — read it back.
+    const { data: retry } = await supabase.from("spiritsprint_sessions").select("*").eq("slug", slug).maybeSingle();
+    if (retry) return retry;
+    throw error;
+  }
+  return created;
+}
+
+// ---------- Participant bootstrap (anonymous, per-session, kept in localStorage) ----------
+function ensureParticipant(session) {
+  const key = `spiritsprint_participant_${session.id}`;
+  const stored = localStorage.getItem(key);
+  if (stored) return JSON.parse(stored);
+  return null; // created async below once we know we need a fresh row
+}
+
+async function createParticipant(session) {
+  const display_name = `${randomFrom(ADJECTIVES)} ${randomFrom(ANIMALS)}`;
+  const color = randomFrom(COLORS);
+  const { data, error } = await supabase.from("spiritsprint_participants")
+    .insert({ session_id: session.id, display_name, color }).select().single();
+  if (error) throw error;
+  localStorage.setItem(`spiritsprint_participant_${session.id}`, JSON.stringify(data));
+  return data;
+}
+
+// ---------- App state ----------
+let session, participant, notes = [], votes = [];
+
+const AXES = [
+  { key: "playful_serious", left: "Playful", right: "Serious" },
+  { key: "conventional_rebel", left: "Conventional", right: "Rebel" },
+  { key: "contemporary_classic", left: "Contemporary", right: "Classic" },
+  { key: "elite_broad", left: "Elite", right: "Broad" },
+];
+const BOARDS = ["culture", "technology", "business", "planet", "organisation"];
+
+function myVoteFor(noteId) {
+  return votes.find(v => v.note_id === noteId && v.participant_id === participant.id);
+}
+function voteCount(noteId) {
+  return votes.filter(v => v.note_id === noteId).length;
+}
+
+// ---------- Render: Values Board ----------
+function renderBoard() {
+  BOARDS.forEach(board => {
+    const col = document.querySelector(`[data-board="${board}"]`);
+    if (!col) return;
+    const container = col.querySelector("[data-notes]");
+    const boardNotes = notes.filter(n => n.board === board)
+      .map(n => ({ ...n, _votes: voteCount(n.id) }))
+      .sort((a, b) => b._votes - a._votes || new Date(a.created_at) - new Date(b.created_at));
+    const topVotes = boardNotes[0]?._votes ?? 0;
+    container.innerHTML = "";
+    boardNotes.forEach(n => {
+      const div = document.createElement("div");
+      const isKeeper = n._votes > 0 && n._votes === topVotes;
+      div.className = "note" + (isKeeper ? " kept" : "") + (myVoteFor(n.id) ? " voted-by-me" : "");
+      div.dataset.noteId = n.id;
+      const textSpan = document.createElement("span");
+      textSpan.textContent = n.text;
+      div.appendChild(textSpan);
+      if (n._votes > 0) {
+        const voteSpan = document.createElement("span");
+        voteSpan.className = "vote";
+        voteSpan.textContent = "●".repeat(Math.min(n._votes, 8));
+        div.appendChild(voteSpan);
+      }
+      container.appendChild(div);
+    });
+  });
+}
+
+async function toggleVote(noteId) {
+  const existing = myVoteFor(noteId);
+  if (existing) {
+    votes = votes.filter(v => v.id !== existing.id);
+    renderBoard();
+    await supabase.from("spiritsprint_votes").delete().eq("id", existing.id);
+  } else {
+    const optimistic = { id: `pending-${noteId}`, note_id: noteId, participant_id: participant.id };
+    votes.push(optimistic);
+    renderBoard();
+    const { error } = await supabase.from("spiritsprint_votes")
+      .insert({ note_id: noteId, participant_id: participant.id });
+    if (error) { votes = votes.filter(v => v !== optimistic); renderBoard(); }
+  }
+}
+
+document.querySelectorAll("[data-board]").forEach(col => {
+  const board = col.dataset.board;
+  col.querySelector("[data-notes]").addEventListener("click", (e) => {
+    const noteEl = e.target.closest(".note");
+    if (noteEl) toggleVote(noteEl.dataset.noteId);
+  });
+  col.querySelector("[data-note-form]").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const input = e.target.querySelector("input");
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = "";
+    const { data, error } = await supabase.from("spiritsprint_notes")
+      .insert({ session_id: session.id, participant_id: participant.id, board, text }).select().single();
+    if (!error) { notes.push(data); renderBoard(); }
+  });
+});
+
+// ---------- Render: Personality Sliders + Positioning ----------
+function personalityValue(axisKey) { return session.personality?.[axisKey] ?? 0; }
+function positioningAxes() { return session.positioning_axes ?? []; }
+
+function renderPersonality() {
+  AXES.forEach(axis => {
+    const row = document.querySelector(`.slider-row[data-axis="${axis.key}"]`);
+    if (!row) return;
+    const value = personalityValue(axis.key);
+    row.querySelector(".thumb").style.left = `${((value + 1) / 2) * 100}%`;
+    const chosenIndex = positioningAxes().indexOf(axis.key);
+    row.classList.toggle("chosen", chosenIndex !== -1);
+    const btn = row.querySelector("[data-axis-toggle]");
+    btn.textContent = chosenIndex !== -1 ? `Achse ${chosenIndex + 1}` : "Achse wählen";
+  });
+}
+
+function renderPositioning() {
+  const axes = positioningAxes();
+  const quad = document.getElementById("positioning-quad");
+  const empty = document.querySelector("[data-quad-empty]");
+  if (axes.length < 2) {
+    quad.style.visibility = "hidden";
+    empty.style.display = "block";
+    return;
+  }
+  quad.style.visibility = "visible";
+  empty.style.display = "none";
+  const [xKey, yKey] = axes;
+  const xAxis = AXES.find(a => a.key === xKey);
+  const yAxis = AXES.find(a => a.key === yKey);
+  const xVal = personalityValue(xKey);
+  const yVal = personalityValue(yKey);
+  const pin = document.querySelector("[data-pin-us]");
+  pin.style.left = `${((xVal + 1) / 2) * 100}%`;
+  pin.style.top = `${((yVal + 1) / 2) * 100}%`;
+  const axisX = document.querySelector("[data-axis-x]");
+  axisX.children[0].textContent = xAxis.left;
+  axisX.children[1].textContent = xAxis.right;
+  const axisY = document.querySelector("[data-axis-y]");
+  axisY.children[0].textContent = yAxis.left;
+  axisY.children[1].textContent = yAxis.right;
+}
+
+async function updateSession(patch) {
+  Object.assign(session, patch);
+  renderPersonality();
+  renderPositioning();
+  await supabase.from("spiritsprint_sessions").update(patch).eq("id", session.id);
+}
+
+document.querySelectorAll(".slider-row[data-axis]").forEach(row => {
+  const axisKey = row.dataset.axis;
+  row.querySelector("[data-track]").addEventListener("click", (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    const value = ratio * 2 - 1;
+    updateSession({ personality: { ...session.personality, [axisKey]: value } });
+  });
+  row.querySelector("[data-axis-toggle]").addEventListener("click", () => {
+    let axes = [...positioningAxes()];
+    if (axes.includes(axisKey)) {
+      axes = axes.filter(k => k !== axisKey);
+    } else {
+      axes.push(axisKey);
+      if (axes.length > 2) axes.shift();
+    }
+    updateSession({ positioning_axes: axes });
+  });
+});
+
+// ---------- Share link ----------
+function renderShareLink() {
+  const link = url.toString();
+  document.querySelectorAll("[data-share-link]").forEach(el => el.value = link);
+}
+document.querySelectorAll("[data-copy-link]").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(url.toString());
+    const original = btn.textContent;
+    btn.textContent = "Kopiert ✓";
+    btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = original; btn.classList.remove("copied"); }, 1200);
+  });
+});
+
+// ---------- Realtime ----------
+function subscribeRealtime() {
+  const channel = supabase.channel(`session-${session.id}`);
+
+  channel.on("postgres_changes", { event: "*", schema: "public", table: "spiritsprint_notes", filter: `session_id=eq.${session.id}` }, (payload) => {
+    if (payload.eventType === "INSERT" && !notes.some(n => n.id === payload.new.id)) notes.push(payload.new);
+    if (payload.eventType === "DELETE") notes = notes.filter(n => n.id !== payload.old.id);
+    renderBoard();
+  });
+
+  channel.on("postgres_changes", { event: "*", schema: "public", table: "spiritsprint_votes" }, (payload) => {
+    const noteIds = new Set(notes.map(n => n.id));
+    if (payload.eventType === "INSERT" && noteIds.has(payload.new.note_id) && !votes.some(v => v.id === payload.new.id)) {
+      votes = votes.filter(v => !(v.note_id === payload.new.note_id && v.participant_id === payload.new.participant_id));
+      votes.push(payload.new);
+    }
+    if (payload.eventType === "DELETE") votes = votes.filter(v => v.id !== payload.old.id);
+    renderBoard();
+  });
+
+  channel.on("postgres_changes", { event: "UPDATE", schema: "public", table: "spiritsprint_sessions", filter: `id=eq.${session.id}` }, (payload) => {
+    session = payload.new;
+    renderPersonality();
+    renderPositioning();
+  });
+
+  channel.on("presence", { event: "sync" }, () => {
+    const count = Object.keys(channel.presenceState()).length;
+    document.querySelectorAll("[data-online-count]").forEach(el => el.textContent = `${count} online`);
+  });
+
+  channel.subscribe(async (status) => {
+    if (status === "SUBSCRIBED") {
+      await channel.track({ participant_id: participant.id, display_name: participant.display_name });
+    }
+  });
+}
+
+// ---------- Boot ----------
+(async function boot() {
+  session = await ensureSession(slug);
+  const cached = ensureParticipant(session);
+  participant = cached || await createParticipant(session);
+
+  const [{ data: initialNotes }, { data: sessionNotes }] = await Promise.all([
+    supabase.from("spiritsprint_notes").select("*").eq("session_id", session.id),
+    supabase.from("spiritsprint_sessions").select("*").eq("id", session.id).maybeSingle(),
+  ]);
+  notes = initialNotes || [];
+  if (sessionNotes) session = sessionNotes;
+
+  if (notes.length) {
+    const { data: initialVotes } = await supabase.from("spiritsprint_votes")
+      .select("*").in("note_id", notes.map(n => n.id));
+    votes = initialVotes || [];
+  }
+
+  renderShareLink();
+  renderBoard();
+  renderPersonality();
+  renderPositioning();
+  subscribeRealtime();
+})();
+</script>
+</body>
+</html>
