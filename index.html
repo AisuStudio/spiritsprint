@@ -777,6 +777,14 @@ table.measures tr td:first-child { font-family: var(--mono); font-weight: 700; f
           <button class="btn" type="button" data-copy-link>Team-Link teilen</button>
         </div>
       </div>
+
+      <div class="card" style="margin-top:var(--sp-lg);">
+        <p class="eyebrow" style="margin:0 0 8px;">Markdown-Export — echte Session-Daten</p>
+        <p style="font-size:12.5px;color:var(--muted);margin:0 0 var(--sp-md);">Personality/Positioning, Values Board & Business Model Canvas als Klartext, direkt aus eurer Session — zum Reinkopieren in eine KI zur Gegenprüfung. Value Measures, Roadmap, Trinity und die Spirit Card oben sind in diesem Prototyp noch Beispieltext und nicht Teil dieses Exports.</p>
+        <div class="export-actions">
+          <button class="btn primary" type="button" data-export-md>Als Markdown kopieren</button>
+        </div>
+      </div>
     </section>
 
   </main>
@@ -852,6 +860,19 @@ const BOARDS = [
   "bmc_partners", "bmc_activities", "bmc_resources", "bmc_value",
   "bmc_relationships", "bmc_channels", "bmc_segments", "bmc_cost", "bmc_revenue",
 ];
+const VALUES_BOARDS = ["culture", "technology", "business", "planet", "organisation"];
+const BMC_BOARDS = [
+  "bmc_partners", "bmc_activities", "bmc_resources", "bmc_value",
+  "bmc_relationships", "bmc_channels", "bmc_segments", "bmc_cost", "bmc_revenue",
+];
+const BOARD_LABELS = {
+  culture: "Culture", technology: "Technology", business: "Business",
+  planet: "Planet", organisation: "Organisation",
+  bmc_partners: "Key Partners", bmc_activities: "Key Activities",
+  bmc_resources: "Key Resources", bmc_value: "Value Propositions",
+  bmc_relationships: "Customer Relationships", bmc_channels: "Channels",
+  bmc_segments: "Customer Segments", bmc_cost: "Cost Structure", bmc_revenue: "Revenue Streams",
+};
 
 function myVoteFor(noteId) {
   return votes.find(v => v.note_id === noteId && v.participant_id === participant.id);
@@ -1067,6 +1088,56 @@ document.querySelectorAll("[data-copy-link]").forEach(btn => {
     btn.textContent = "Kopiert ✓";
     btn.classList.add("copied");
     setTimeout(() => { btn.textContent = original; btn.classList.remove("copied"); }, 1200);
+  });
+});
+
+// ---------- Markdown export ----------
+function boardNotesSorted(board) {
+  return notes.filter(n => n.board === board)
+    .map(n => ({ ...n, _votes: voteCount(n.id) }))
+    .sort((a, b) => b._votes - a._votes || new Date(a.created_at) - new Date(b.created_at));
+}
+function boardToMarkdown(board) {
+  const boardNotes = boardNotesSorted(board);
+  const topVotes = boardNotes[0]?._votes ?? 0;
+  const lines = [`### ${BOARD_LABELS[board] || board}`];
+  if (!boardNotes.length) { lines.push("_(noch leer)_"); return lines.join("\n"); }
+  boardNotes.forEach(n => {
+    const isKeeper = n._votes > 0 && n._votes === topVotes;
+    const tag = isKeeper ? " — **Keeper**" : n._votes ? ` (${n._votes} Stimme${n._votes === 1 ? "" : "n"})` : "";
+    lines.push(`- ${n.text}${tag}`);
+  });
+  return lines.join("\n");
+}
+function personalityToMarkdown() {
+  const lines = AXES.map(axis => {
+    const v = personalityValue(axis.key);
+    const chosen = positioningAxes().includes(axis.key) ? " *(Positioning-Achse)*" : "";
+    const lean = v > 0.15 ? axis.right : v < -0.15 ? axis.left : "Mitte";
+    return `- ${axis.left} ↔ ${axis.right}: **${v.toFixed(2)}** → tendiert zu „${lean}“${chosen}`;
+  });
+  return lines.join("\n");
+}
+function buildMarkdown() {
+  const parts = [
+    [`# Spirit Sprint — Export`,
+     `Projekt: ${session.project_name || "Euer Projekt"}`,
+     `Session-Link: ${url.toString()}`].join("\n"),
+    `_Hinweis: Value Measures, Roadmap, Trinity Collector und die Spirit Card sind in diesem Prototyp noch statischer Beispieltext und nicht Teil dieses Exports — nur echte, eingegebene Session-Daten stehen unten._`,
+    [`## Persönlichkeit → Positioning`, personalityToMarkdown()].join("\n"),
+    [`## Values Board`, ...VALUES_BOARDS.map(boardToMarkdown)].join("\n\n"),
+    [`## Business Model Canvas`,
+     `_Struktur nach dem Business Model Canvas von Strategyzer, CC BY-SA 3.0._`,
+     ...BMC_BOARDS.map(boardToMarkdown)].join("\n\n"),
+  ];
+  return parts.join("\n\n");
+}
+document.querySelectorAll("[data-export-md]").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(buildMarkdown());
+    const original = btn.textContent;
+    btn.textContent = "Kopiert ✓";
+    setTimeout(() => { btn.textContent = original; }, 1200);
   });
 });
 
