@@ -712,6 +712,9 @@ table.measures tr td:first-child { font-family: var(--mono); font-weight: 700; f
         </div>
       </div>
       <p class="board-hint">Klick = abstimmen. Doppelklick = bearbeiten. „×“ = löschen. Meistgevotete Karte pro Feld wird „Keeper“ (gelb).</p>
+      <div class="export-actions" style="margin-top:var(--sp-md);">
+        <button class="btn" type="button" data-export-md="bmc">Nur BMC als Markdown kopieren</button>
+      </div>
       <p class="bmc-credit">Struktur basiert auf dem <a href="https://www.strategyzer.com/library/the-business-model-canvas" target="_blank" rel="noopener">Business Model Canvas</a> von Strategyzer (strategyzer.com), lizenziert unter <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a>.</p>
     </section>
 
@@ -1118,6 +1121,16 @@ function personalityToMarkdown() {
   });
   return lines.join("\n");
 }
+function buildBmcMarkdown() {
+  const parts = [
+    [`# Business Model Canvas — Export`,
+     `Projekt: ${session.project_name || "Euer Projekt"}`,
+     `Session-Link: ${url.toString()}`].join("\n"),
+    `_Struktur nach dem Business Model Canvas von Strategyzer (strategyzer.com), lizenziert unter CC BY-SA 3.0._`,
+    ...BMC_BOARDS.map(boardToMarkdown),
+  ];
+  return parts.join("\n\n");
+}
 function buildMarkdown() {
   const parts = [
     [`# Spirit Sprint — Export`,
@@ -1134,7 +1147,8 @@ function buildMarkdown() {
 }
 document.querySelectorAll("[data-export-md]").forEach(btn => {
   btn.addEventListener("click", async () => {
-    await navigator.clipboard.writeText(buildMarkdown());
+    const md = btn.dataset.exportMd === "bmc" ? buildBmcMarkdown() : buildMarkdown();
+    await navigator.clipboard.writeText(md);
     const original = btn.textContent;
     btn.textContent = "Kopiert ✓";
     setTimeout(() => { btn.textContent = original; }, 1200);
