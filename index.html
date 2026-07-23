@@ -195,14 +195,16 @@ label.step { display: block; }
 #t3:checked ~ .shell .p3,
 #t4:checked ~ .shell .p4,
 #t5:checked ~ .shell .p5,
-#t6:checked ~ .shell .p6 { display: block; }
+#t6:checked ~ .shell .p6,
+#t7:checked ~ .shell .p7 { display: block; }
 
 #t1:checked ~ .shell label[for="t1"],
 #t2:checked ~ .shell label[for="t2"],
 #t3:checked ~ .shell label[for="t3"],
 #t4:checked ~ .shell label[for="t4"],
 #t5:checked ~ .shell label[for="t5"],
-#t6:checked ~ .shell label[for="t6"] {
+#t6:checked ~ .shell label[for="t6"],
+#t7:checked ~ .shell label[for="t7"] {
   background: var(--highlight); color: var(--highlight-ink); font-weight: 700;
 }
 
@@ -294,6 +296,32 @@ label.step { display: block; }
 }
 .board-hint { font-size: 11.5px; color: var(--muted); margin-top: var(--sp-lg); }
 
+/* Business Model Canvas — classic 5-column / 3-row layout */
+.board-bmc {
+  display: grid; gap: var(--sp-md);
+  grid-template-columns: 1fr 1fr 1.2fr 1fr 1fr;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "partners activities value relationships segments"
+    "partners resources  value channels      segments"
+    "cost cost cost revenue revenue";
+}
+.board-bmc [data-board="bmc_partners"]     { grid-area: partners; }
+.board-bmc [data-board="bmc_activities"]   { grid-area: activities; }
+.board-bmc [data-board="bmc_resources"]    { grid-area: resources; }
+.board-bmc [data-board="bmc_value"]        { grid-area: value; background: var(--surface-2); border-radius: 8px; padding: var(--sp-sm); }
+.board-bmc [data-board="bmc_relationships"]{ grid-area: relationships; }
+.board-bmc [data-board="bmc_channels"]     { grid-area: channels; }
+.board-bmc [data-board="bmc_segments"]     { grid-area: segments; }
+.board-bmc [data-board="bmc_cost"]         { grid-area: cost; }
+.board-bmc [data-board="bmc_revenue"]      { grid-area: revenue; }
+.board-bmc .board-col { display: flex; flex-direction: column; min-height: 0; }
+.bmc-credit { font-size: 11px; color: var(--muted); margin-top: var(--sp-xl); padding-top: var(--sp-md); border-top: 1px solid var(--border); }
+.bmc-credit a { color: var(--muted); }
+@media (max-width: 900px) {
+  .board-bmc { grid-template-columns: 1fr; grid-template-areas: "partners" "activities" "resources" "value" "relationships" "channels" "segments" "cost" "revenue"; }
+}
+
 /* Table */
 table.measures { width: 100%; border-collapse: collapse; font-size: 13px; }
 table.measures th {
@@ -368,6 +396,7 @@ table.measures tr td:first-child { font-family: var(--mono); font-weight: 700; f
 <input type="radio" name="tab" id="t4" class="tabctl">
 <input type="radio" name="tab" id="t5" class="tabctl">
 <input type="radio" name="tab" id="t6" class="tabctl">
+<input type="radio" name="tab" id="t7" class="tabctl">
 
 <div class="shell">
   <aside class="rail">
@@ -398,9 +427,13 @@ table.measures tr td:first-child { font-family: var(--mono); font-weight: 700; f
         <label class="step" for="t4"><span class="n">03</span>Value Measures → Roadmap</label>
       </div>
       <div class="step-group">
+        <p class="step-group-label">Business Model</p>
+        <label class="step" for="t7"><span class="n">04</span>Business Model Canvas</label>
+      </div>
+      <div class="step-group">
         <p class="step-group-label">Spirit</p>
-        <label class="step" for="t5"><span class="n">04</span>Trinity Collector</label>
-        <label class="step" for="t6"><span class="n">05</span>Spirit Card Export</label>
+        <label class="step" for="t5"><span class="n">05</span>Trinity Collector</label>
+        <label class="step" for="t6"><span class="n">06</span>Spirit Card Export</label>
       </div>
     </nav>
     <div class="rail-foot">Beispielprojekt: <br>„Comic Invasion Berlin“</div>
@@ -581,6 +614,94 @@ table.measures tr td:first-child { font-family: var(--mono); font-weight: 700; f
       </div>
     </section>
 
+    <!-- PANEL — BUSINESS MODEL CANVAS -->
+    <section class="panel p7">
+      <div class="head-row">
+        <div>
+          <p class="eyebrow">Business Model · Schritt 04</p>
+          <h1>Business Model Canvas</h1>
+        </div>
+        <span class="fix-badge">nicht im Original-Deck — <b>eigenes Zusatzmodul</b></span>
+      </div>
+      <p class="lede">Ergänzt den Sprint um die wirtschaftliche Seite: wie das Projekt Wert schafft, liefert und einnimmt. Gleicher Mechanismus wie beim Values Board — sammeln, dann pro Feld abstimmen. Die „Keeper“ sind eure erste Version des Modells, jederzeit änderbar.</p>
+      <div class="board board-bmc">
+        <div class="board-col" data-board="bmc_partners">
+          <h4>Key Partners</h4>
+          <div class="notes" data-notes></div>
+          <form class="note-form" data-note-form>
+            <input type="text" maxlength="80" placeholder="z. B. „Druckereien vor Ort“" required>
+            <button type="submit">+</button>
+          </form>
+        </div>
+        <div class="board-col" data-board="bmc_activities">
+          <h4>Key Activities</h4>
+          <div class="notes" data-notes></div>
+          <form class="note-form" data-note-form>
+            <input type="text" maxlength="80" placeholder="z. B. „Kuration & Booking“" required>
+            <button type="submit">+</button>
+          </form>
+        </div>
+        <div class="board-col" data-board="bmc_value">
+          <h4>Value Propositions</h4>
+          <div class="notes" data-notes></div>
+          <form class="note-form" data-note-form>
+            <input type="text" maxlength="80" placeholder="z. B. „Zugang zu Independent-Comics“" required>
+            <button type="submit">+</button>
+          </form>
+        </div>
+        <div class="board-col" data-board="bmc_relationships">
+          <h4>Customer Relationships</h4>
+          <div class="notes" data-notes></div>
+          <form class="note-form" data-note-form>
+            <input type="text" maxlength="80" placeholder="z. B. „Community, kein Ticketing-Anonymitat“" required>
+            <button type="submit">+</button>
+          </form>
+        </div>
+        <div class="board-col" data-board="bmc_segments">
+          <h4>Customer Segments</h4>
+          <div class="notes" data-notes></div>
+          <form class="note-form" data-note-form>
+            <input type="text" maxlength="80" placeholder="z. B. „Comic-Nerds 20–40“" required>
+            <button type="submit">+</button>
+          </form>
+        </div>
+        <div class="board-col" data-board="bmc_resources">
+          <h4>Key Resources</h4>
+          <div class="notes" data-notes></div>
+          <form class="note-form" data-note-form>
+            <input type="text" maxlength="80" placeholder="z. B. „Location-Vertrag“" required>
+            <button type="submit">+</button>
+          </form>
+        </div>
+        <div class="board-col" data-board="bmc_channels">
+          <h4>Channels</h4>
+          <div class="notes" data-notes></div>
+          <form class="note-form" data-note-form>
+            <input type="text" maxlength="80" placeholder="z. B. „Instagram, Newsletter“" required>
+            <button type="submit">+</button>
+          </form>
+        </div>
+        <div class="board-col" data-board="bmc_cost">
+          <h4>Cost Structure</h4>
+          <div class="notes" data-notes></div>
+          <form class="note-form" data-note-form>
+            <input type="text" maxlength="80" placeholder="z. B. „Location-Miete“" required>
+            <button type="submit">+</button>
+          </form>
+        </div>
+        <div class="board-col" data-board="bmc_revenue">
+          <h4>Revenue Streams</h4>
+          <div class="notes" data-notes></div>
+          <form class="note-form" data-note-form>
+            <input type="text" maxlength="80" placeholder="z. B. „Ticketverkauf“" required>
+            <button type="submit">+</button>
+          </form>
+        </div>
+      </div>
+      <p class="board-hint">Klick auf eine Karte = abstimmen. Meistgevotete Karte pro Feld wird „Keeper“ (gelb).</p>
+      <p class="bmc-credit">Struktur basiert auf dem <a href="https://www.strategyzer.com/library/the-business-model-canvas" target="_blank" rel="noopener">Business Model Canvas</a> von Strategyzer (strategyzer.com), lizenziert unter <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a>.</p>
+    </section>
+
     <!-- PANEL 4 — TRINITY COLLECTOR -->
     <section class="panel p5">
       <div class="head-row">
@@ -713,7 +834,11 @@ const AXES = [
   { key: "contemporary_classic", left: "Contemporary", right: "Classic" },
   { key: "elite_broad", left: "Elite", right: "Broad" },
 ];
-const BOARDS = ["culture", "technology", "business", "planet", "organisation"];
+const BOARDS = [
+  "culture", "technology", "business", "planet", "organisation",
+  "bmc_partners", "bmc_activities", "bmc_resources", "bmc_value",
+  "bmc_relationships", "bmc_channels", "bmc_segments", "bmc_cost", "bmc_revenue",
+];
 
 function myVoteFor(noteId) {
   return votes.find(v => v.note_id === noteId && v.participant_id === participant.id);
