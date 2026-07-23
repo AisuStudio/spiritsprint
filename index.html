@@ -276,14 +276,27 @@ label.step { display: block; }
   color: var(--muted); margin: 0 0 var(--sp-sm); text-align: center;
 }
 .note {
-  background: var(--surface); border-radius: 4px; padding: 8px 30px 8px 10px; font-size: 12.5px;
+  background: var(--surface); border-radius: 4px; padding: 8px 26px 8px 10px; font-size: 12.5px;
   margin-bottom: 8px; position: relative; border: 1px solid transparent; cursor: pointer; user-select: none;
 }
 .note:hover { border-color: var(--accent); }
 .note.voted-by-me { border-color: var(--accent); border-style: dashed; }
 .note.kept { background: var(--highlight); color: var(--highlight-ink); font-weight: 700; border-color: transparent; }
-.vote { position: absolute; right: 6px; top: 8px; font-family: var(--mono); font-size: 9px; color: var(--accent); font-weight: 700; }
+.vote { margin-left: 6px; font-family: var(--mono); font-size: 9px; color: var(--accent); font-weight: 700; }
 .note.kept .vote { color: var(--highlight-ink); opacity: .7; }
+.note-del {
+  position: absolute; right: 4px; top: 4px; width: 18px; height: 18px; line-height: 16px;
+  background: none; border: 0; border-radius: 3px; color: var(--muted); font-size: 14px;
+  cursor: pointer; opacity: 0; transition: opacity .1s, background .1s, color .1s;
+}
+.note:hover .note-del { opacity: .7; }
+.note-del:hover { opacity: 1; background: rgba(0,0,0,.12); color: var(--ink); }
+.note.kept .note-del { color: var(--highlight-ink); }
+.note.kept .note-del:hover { background: rgba(0,0,0,.15); }
+.note-edit-input {
+  width: 100%; background: var(--surface-2); border: 1px solid var(--accent); border-radius: 3px;
+  padding: 3px 5px; font-size: 12.5px; font-family: var(--sans); color: var(--ink);
+}
 .note-form { display: flex; gap: 4px; margin-top: 4px; }
 .note-form input {
   flex: 1; min-width: 0; background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px;
@@ -577,7 +590,7 @@ table.measures tr td:first-child { font-family: var(--mono); font-weight: 700; f
           </form>
         </div>
       </div>
-      <p class="board-hint">Klick auf eine Karte = abstimmen. Die meistgevotete Karte pro Spalte wird automatisch „Keeper“ (gelb) und wandert weiter zu Value Measures &amp; Trinity.</p>
+      <p class="board-hint">Klick = abstimmen. Doppelklick = bearbeiten. „×“ = löschen. Die meistgevotete Karte pro Spalte wird automatisch „Keeper“ (gelb) und wandert weiter zu Value Measures &amp; Trinity.</p>
     </section>
 
     <!-- PANEL 3 — VALUE MEASURES + ROADMAP -->
@@ -698,7 +711,7 @@ table.measures tr td:first-child { font-family: var(--mono); font-weight: 700; f
           </form>
         </div>
       </div>
-      <p class="board-hint">Klick auf eine Karte = abstimmen. Meistgevotete Karte pro Feld wird „Keeper“ (gelb).</p>
+      <p class="board-hint">Klick = abstimmen. Doppelklick = bearbeiten. „×“ = löschen. Meistgevotete Karte pro Feld wird „Keeper“ (gelb).</p>
       <p class="bmc-credit">Struktur basiert auf dem <a href="https://www.strategyzer.com/library/the-business-model-canvas" target="_blank" rel="noopener">Business Model Canvas</a> von Strategyzer (strategyzer.com), lizenziert unter <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a>.</p>
     </section>
 
@@ -864,6 +877,7 @@ function renderBoard() {
       div.className = "note" + (isKeeper ? " kept" : "") + (myVoteFor(n.id) ? " voted-by-me" : "");
       div.dataset.noteId = n.id;
       const textSpan = document.createElement("span");
+      textSpan.dataset.editText = "1";
       textSpan.textContent = n.text;
       div.appendChild(textSpan);
       if (n._votes > 0) {
@@ -872,9 +886,59 @@ function renderBoard() {
         voteSpan.textContent = "●".repeat(Math.min(n._votes, 8));
         div.appendChild(voteSpan);
       }
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "note-del";
+      delBtn.title = "Löschen";
+      delBtn.textContent = "×";
+      div.appendChild(delBtn);
       container.appendChild(div);
     });
   });
+}
+
+async function deleteNote(noteId) {
+  const removed = notes.find(n => n.id === noteId);
+  notes = notes.filter(n => n.id !== noteId);
+  votes = votes.filter(v => v.note_id !== noteId);
+  renderBoard();
+  const { error } = await supabase.from("spiritsprint_notes").delete().eq("id", noteId);
+  if (error && removed) { notes.push(removed); renderBoard(); }
+}
+
+async function editNote(noteId, text) {
+  const note = notes.find(n => n.id === noteId);
+  if (!note || note.text === text) { renderBoard(); return; }
+  const prev = note.text;
+  note.text = text;
+  renderBoard();
+  const { error } = await supabase.from("spiritsprint_notes").update({ text }).eq("id", noteId);
+  if (error) { note.text = prev; renderBoard(); }
+}
+
+function startEditNote(noteEl, noteId) {
+  const textSpan = noteEl.querySelector("[data-edit-text]");
+  const current = textSpan.textContent;
+  const input = document.createElement("input");
+  input.type = "text";
+  input.maxLength = 80;
+  input.value = current;
+  input.className = "note-edit-input";
+  textSpan.replaceWith(input);
+  input.focus();
+  input.select();
+  let done = false;
+  const finish = (save) => {
+    if (done) return;
+    done = true;
+    if (save) editNote(noteId, input.value.trim() || current);
+    else renderBoard();
+  };
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") finish(true);
+    if (e.key === "Escape") finish(false);
+  });
+  input.addEventListener("blur", () => finish(true));
 }
 
 async function toggleVote(noteId) {
@@ -896,8 +960,17 @@ async function toggleVote(noteId) {
 document.querySelectorAll("[data-board]").forEach(col => {
   const board = col.dataset.board;
   col.querySelector("[data-notes]").addEventListener("click", (e) => {
+    if (e.target.closest(".note-edit-input")) return;
+    const delBtn = e.target.closest(".note-del");
     const noteEl = e.target.closest(".note");
-    if (noteEl) toggleVote(noteEl.dataset.noteId);
+    if (!noteEl) return;
+    if (delBtn) { deleteNote(noteEl.dataset.noteId); return; }
+    toggleVote(noteEl.dataset.noteId);
+  });
+  col.querySelector("[data-notes]").addEventListener("dblclick", (e) => {
+    if (e.target.closest(".note-del") || e.target.closest(".note-edit-input")) return;
+    const noteEl = e.target.closest(".note");
+    if (noteEl) startEditNote(noteEl, noteEl.dataset.noteId);
   });
   col.querySelector("[data-note-form]").addEventListener("submit", async (e) => {
     e.preventDefault();
